@@ -15,10 +15,22 @@ class MahasiswaController extends Controller
      */
     public function index()
     {
-        //fungsi eloquent menampilkan data menggunakan pagination
-        $mahasiswa = Mahasiswa::all(); // Mengambil semua isi tabel
-        $paginate = Mahasiswa::orderBy('id_mahasiswa', 'asc')->paginate(3);
-        return view('mahasiswa.index', ['mahasiswa' => $mahasiswa,'paginate'=>$paginate]);
+        if (request('search')) {
+            $paginate = Mahasiswa::where('nama', 'like', '%' . request('search') . '%')
+                                    ->orwhere('nim', 'like', '%' . request('search') . '%')
+                                    ->orwhere('email', 'like', '%' . request('search') . '%')
+                                    ->orwhere('jenis_kelamin', 'like', '%' . request('search') . '%')
+                                    ->orwhere('tanggal_lahir', 'like', '%' . request('search') . '%')
+                                    ->orwhere('alamat', 'like', '%' . request('search') . '%')
+                                    ->orwhere('kelas', 'like', '%' . request('search') . '%')
+                                    ->orwhere('jurusan', 'like', '%' . request('search') . '%')->paginate(5); // Mengambil semua isi tabel
+            return view('mahasiswa.index', ['paginate'=>$paginate]);
+        }else{
+                //fungsi eloquent menampilkan data menggunakan pagination
+                $mahasiswa = Mahasiswa::all(); // Mengambil semua isi tabel
+                $paginate = Mahasiswa::orderBy('id_mahasiswa', 'asc')->paginate(5);
+                return view('mahasiswa.index', ['mahasiswa' => $mahasiswa,'paginate'=>$paginate]);
+        }
     }
 
     /**
@@ -45,6 +57,10 @@ class MahasiswaController extends Controller
             'Nama' => 'required',
             'Kelas' => 'required',
             'Jurusan' => 'required',
+            'Jenis_Kelamin' => 'required',
+            'Email' => 'required',
+            'Alamat' => 'required',
+            'Tanggal_Lahir' => 'required',
         ]);
         //fungsi eloquent untuk menambah data
         Mahasiswa::create($request->all());
@@ -94,6 +110,10 @@ class MahasiswaController extends Controller
             'Nama' => 'required',
             'Kelas' => 'required',
             'Jurusan' => 'required',
+            'Jenis_Kelamin' => 'required',
+            'Email' => 'required',
+            'Alamat' => 'required',
+            'Tanggal_Lahir' => 'required',
         ]);
         //fungsi eloquent untuk mengupdate data inputan kita
         Mahasiswa::where('nim', $nim)
@@ -102,6 +122,10 @@ class MahasiswaController extends Controller
             'nama'=>$request->Nama,
             'kelas'=>$request->Kelas,
             'jurusan'=>$request->Jurusan,
+            'jenis_kelamin'=>$request->Jenis_Kelamin,
+            'email'=>$request->Email,
+            'alamat'=>$request->Alamat,
+            'tanggal_lahir'=>$request->Tanggal_Lahir,
         ]);
         //jika data berhasil diupdate, akan kembali ke halaman utama
         return redirect()->route('mahasiswa.index')
